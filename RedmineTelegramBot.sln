@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31025.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedmineTelegramBot.Standalone", "RedmineTelegramBot.Standalone\RedmineTelegramBot.Standalone.csproj", "{F73BA73B-D0D2-4D51-84FD-453AACE6A686}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedmineTelegramBot.Core", "RedmineTelegramBot.Core\RedmineTelegramBot.Core.csproj", "{A2544C49-5EEA-4656-920C-0E3EE9C3FE4F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F73BA73B-D0D2-4D51-84FD-453AACE6A686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F73BA73B-D0D2-4D51-84FD-453AACE6A686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F73BA73B-D0D2-4D51-84FD-453AACE6A686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F73BA73B-D0D2-4D51-84FD-453AACE6A686}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2544C49-5EEA-4656-920C-0E3EE9C3FE4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2544C49-5EEA-4656-920C-0E3EE9C3FE4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2544C49-5EEA-4656-920C-0E3EE9C3FE4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2544C49-5EEA-4656-920C-0E3EE9C3FE4F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CB3AD128-26A7-4293-807E-92B49FC87341}
+	EndGlobalSection
+EndGlobal
