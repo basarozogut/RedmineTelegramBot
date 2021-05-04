@@ -22,7 +22,7 @@ namespace RedmineTelegramBot.Core
 
         public IConversation CreateConversation()
         {
-            return new Conversation(_telegramBotClient, _restClientFactory);
+            return new Conversation(_telegramBotClient, new RedmineApiClient(_restClientFactory));
         }
     }
 }

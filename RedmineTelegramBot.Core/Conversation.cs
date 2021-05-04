@@ -24,7 +24,7 @@ namespace RedmineTelegramBot.Core
         }
 
         private readonly ITelegramBotClient _telegramBotClient;
-        private readonly IRestClientFactory _restClientFactory;
+        private readonly IRedmineApiClient _redmineApiClient;
 
         private State _state = State.Command;
 
@@ -33,10 +33,10 @@ namespace RedmineTelegramBot.Core
 
         public Conversation(
             ITelegramBotClient telegramBotClient,
-            IRestClientFactory restClientFactory)
+            IRedmineApiClient redmineApiClient)
         {
             _telegramBotClient = telegramBotClient;
-            _restClientFactory = restClientFactory;
+            _redmineApiClient = redmineApiClient;
         }
 
         public async Task Process(Message message)
@@ -134,21 +134,7 @@ namespace RedmineTelegramBot.Core
         {
             searchPattern = searchPattern.Trim();
 
-            var client = _restClientFactory.CreateRestClient();
-
-            var projects = new List<RedmineProjectModel>();
-            var offset = 0;
-            var limit = 100;
-            var total = 9999;
-            
-            while (offset < total)
-            {
-                var request = new RestRequest($"/projects.json?offset={offset}&limit={limit}");
-                var result = await client.GetAsync<RedmineGetProjectsResultModel>(request);
-                projects.AddRange(result.Projects);
-                total = result.TotalCount;
-                offset += limit;
-            }
+            var projects = await _redmineApiClient.GetProjects();
 
             if (searchPattern != "*")
             {
@@ -171,12 +157,7 @@ namespace RedmineTelegramBot.Core
 
         private async Task AddIssue(Message message)
         {
-            var client = _restClientFactory.CreateRestClient();
-
-            var request = new RestRequest("/issues.json", DataFormat.Json);
-            request.AddJsonBody(_createIssueModel);
-
-            var response = await client.PostAsync<RedmineResponseModel>(request);
+            var response = await _redmineApiClient.AddIssue(_createIssueModel);
             if (response.Errors != null && response.Errors.Count > 0)
             {
                 await ReplyMessage(message, string.Join("\n", response.Errors));

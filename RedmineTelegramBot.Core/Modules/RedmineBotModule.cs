@@ -19,6 +19,7 @@ namespace RedmineTelegramBot.Core.Modules
             services.AddSingleton<ITelegramBotClient>(c => new TelegramBotClient(_options.Token));
             services.AddTransient<IConversationFactory, ConversationFactory>();
             services.AddTransient<IRestClientFactory>(c => new RestClientFactory(_options));
+            services.AddTransient<IRedmineApiClient,RedmineApiClient>();
         }
     }
 }
