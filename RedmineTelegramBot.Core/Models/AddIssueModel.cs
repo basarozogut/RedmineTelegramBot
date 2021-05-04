@@ -21,6 +21,8 @@ namespace RedmineTelegramBot.Core.Models
             public string subject { get; set; }
 
             public string description { get; set; }
+
+            public int tracker_id { get; set; }
         }
     }
 }

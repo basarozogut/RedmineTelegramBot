@@ -47,5 +47,14 @@ namespace RedmineTelegramBot.Core
 
             return client.PostAsync<RedmineResponseModel>(request);
         }
+
+        public async Task<IEnumerable<RedmineTrackerModel>> GetTrackers()
+        {
+            var client = _restClientFactory.CreateRestClient();
+            var request = new RestRequest($"/trackers.json");
+            var result = await client.GetAsync<RedmineGetTrackersResultModel>(request);
+
+            return result.Trackers;
+        }
     }
 }

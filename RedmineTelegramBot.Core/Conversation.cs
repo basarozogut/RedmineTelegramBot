@@ -21,6 +21,7 @@ namespace RedmineTelegramBot.Core
             AddIssueSetIssueProjectId,
             AddIssueSetIssueSubject,
             AddIssueSetIssueDescription,
+            AddIssueSetTrackerId,
         }
 
         private readonly ITelegramBotClient _telegramBotClient;
@@ -87,6 +88,13 @@ namespace RedmineTelegramBot.Core
             if (_state == State.AddIssueSetIssueDescription)
             {
                 _createIssueModel.issue.description = message.Text;
+                await ChangeState(message, State.AddIssueSetTrackerId);
+                return;
+            }
+
+            if (_state == State.AddIssueSetTrackerId)
+            {
+                _createIssueModel.issue.tracker_id = int.Parse(message.Text);
                 await AddIssue(message);
                 await ChangeState(message, State.Command);
                 return;
@@ -110,6 +118,11 @@ namespace RedmineTelegramBot.Core
             else if (state == State.AddIssueSetIssueDescription)
             {
                 await ReplyMessage(message, "Issue Description:\n");
+            }
+            else if (state == State.AddIssueSetTrackerId)
+            {
+                await ReplyWithTrackerList(message);
+                await ReplyMessage(message, "Tracker Id:\n");
             }
             else if (state == State.SearchProjects)
             {
@@ -153,6 +166,14 @@ namespace RedmineTelegramBot.Core
             }
             
             await ChangeState(message, State.Command);
+        }
+
+        private async Task ReplyWithTrackerList(Message message)
+        {
+            var trackers = await _redmineApiClient.GetTrackers();
+            var trackersStr = string.Join("\n", trackers.OrderBy(r => r.Id).Select(r => $"{r.Id}) {r.Name}"));
+
+            await ReplyMessage(message, $"Trackers:\n{trackersStr}");
         }
 
         private async Task AddIssue(Message message)
