@@ -38,9 +38,9 @@ namespace RedmineTelegramBot.Core
 
         private async void _telegramBotClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
+            var chatId = e.Message.Chat.Id;
             try
             {
-                var chatId = e.Message.Chat.Id;
                 if (!_conversations.ContainsKey(chatId))
                 {
                     _conversations[chatId] = _conversationFactory.CreateConversation();
@@ -50,6 +50,16 @@ namespace RedmineTelegramBot.Core
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occured while processing message.");
+
+                try
+                {
+                    _conversations[chatId] = null;
+                    await _telegramBotClient.SendTextMessageAsync(e.Message.Chat, "An error occured while processing your request. Conversation has been reset.");
+                }
+                catch (Exception)
+                {
+                    _logger.LogError(ex, "An error occured while resetting conversation.");
+                }
             }
         }
 
