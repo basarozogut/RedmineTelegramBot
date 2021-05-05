@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using RedmineTelegramBot.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,18 +12,18 @@ namespace RedmineTelegramBot.Core
     {
         private readonly ILogger<RedmineBot> _logger;
         private readonly ITelegramBotClient _telegramBotClient;
-        private readonly IConversationFactory _conversationFactory;
+        private readonly IConversationHandlerFactory _conversationHandlerFactory;
 
-        private readonly Dictionary<long, IConversation> _conversations = new Dictionary<long, IConversation>();
+        private readonly Dictionary<long, ConversationStateModel> _conversationStates = new Dictionary<long, ConversationStateModel>();
 
         public RedmineBot(
             ILogger<RedmineBot> logger,
             ITelegramBotClient telegramBotClient,
-            IConversationFactory conversationFactory)
+            IConversationHandlerFactory conversationFactory)
         {
             _logger = logger;
             _telegramBotClient = telegramBotClient;
-            _conversationFactory = conversationFactory;
+            _conversationHandlerFactory = conversationFactory;
         }
 
         public Task Start()
@@ -38,14 +39,28 @@ namespace RedmineTelegramBot.Core
 
         private async void _telegramBotClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
+            var username = e.Message.Chat.Username;
             var chatId = e.Message.Chat.Id;
+
             try
             {
-                if (!_conversations.ContainsKey(chatId))
+                if (string.IsNullOrEmpty(username))
                 {
-                    _conversations[chatId] = _conversationFactory.CreateConversation();
+                    await _telegramBotClient.SendTextMessageAsync(e.Message.Chat, "You must have a username to use this bot.");
+                    return;
                 }
-                await _conversations[chatId].Process(e.Message);
+
+                if (!_conversationStates.ContainsKey(chatId))
+                {
+                    _conversationStates[chatId] = new ConversationStateModel()
+                    {
+                        ChatId = chatId,
+                        Username = username
+                    };
+                }
+                var handler = _conversationHandlerFactory.CreateConversationHandler(_conversationStates[chatId]);
+
+                await handler.Handle(e.Message);
             }
             catch (Exception ex)
             {
@@ -53,7 +68,7 @@ namespace RedmineTelegramBot.Core
 
                 try
                 {
-                    _conversations[chatId] = null;
+                    _conversationStates[chatId] = null;
                     await _telegramBotClient.SendTextMessageAsync(e.Message.Chat, "An error occured while processing your request. Conversation has been reset.");
                 }
                 catch (Exception)

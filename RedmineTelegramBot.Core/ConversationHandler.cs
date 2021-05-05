@@ -1,46 +1,30 @@
 ﻿using RedmineTelegramBot.Core.Models;
-using RestSharp;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace RedmineTelegramBot.Core
 {
-    public class Conversation : IConversation
+    public class ConversationHandler : IConversationHandler
     {
-        private enum State
-        {
-            Command,
-            // search projects
-            SearchProjects,
-            // add issue
-            AddIssueSetIssueProjectId,
-            AddIssueSetIssueSubject,
-            AddIssueSetIssueDescription,
-            AddIssueSetTrackerId,
-        }
-
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly IRedmineApiClient _redmineApiClient;
 
-        private State _state = State.Command;
+        private readonly ConversationStateModel _conversationState;
 
-        // issue
-        private AddIssueModel _createIssueModel;
-
-        public Conversation(
+        public ConversationHandler(
             ITelegramBotClient telegramBotClient,
-            IRedmineApiClient redmineApiClient)
+            IRedmineApiClient redmineApiClient,
+            ConversationStateModel conversationState)
         {
             _telegramBotClient = telegramBotClient;
             _redmineApiClient = redmineApiClient;
+            _conversationState = conversationState;
         }
 
-        public async Task Process(Message message)
+        public async Task Handle(Message message)
         {
             if (message.Text == $"/{Commands.Cancel}")
             {
@@ -49,7 +33,7 @@ namespace RedmineTelegramBot.Core
                 return;
             }
 
-            if (_state == State.Command)
+            if (_conversationState.State == State.Command)
             {
                 if (message.Text == $"/{Commands.ProjectList}")
                 {
@@ -59,42 +43,42 @@ namespace RedmineTelegramBot.Core
 
                 if (message.Text == $"/{Commands.AddIssue}")
                 {
-                    _createIssueModel = new AddIssueModel();
+                    _conversationState.CreateIssueModel = new AddIssueModel();
                     await ChangeState(message, State.AddIssueSetIssueProjectId);
                     return;
                 }
             }
 
-            if (_state == State.SearchProjects)
+            if (_conversationState.State == State.SearchProjects)
             {
                 await ReplyWithProjectList(message, message.Text);
                 return;
             }
 
-            if (_state == State.AddIssueSetIssueProjectId)
+            if (_conversationState.State == State.AddIssueSetIssueProjectId)
             {
-                _createIssueModel.issue.project_id = int.Parse(message.Text);
+                _conversationState.CreateIssueModel.issue.project_id = int.Parse(message.Text);
                 await ChangeState(message, State.AddIssueSetIssueSubject);
                 return;
             }
 
-            if (_state == State.AddIssueSetIssueSubject)
+            if (_conversationState.State == State.AddIssueSetIssueSubject)
             {
-                _createIssueModel.issue.subject = message.Text;
+                _conversationState.CreateIssueModel.issue.subject = message.Text;
                 await ChangeState(message, State.AddIssueSetIssueDescription);
                 return;
             }
 
-            if (_state == State.AddIssueSetIssueDescription)
+            if (_conversationState.State == State.AddIssueSetIssueDescription)
             {
-                _createIssueModel.issue.description = message.Text;
+                _conversationState.CreateIssueModel.issue.description = message.Text;
                 await ChangeState(message, State.AddIssueSetTrackerId);
                 return;
             }
 
-            if (_state == State.AddIssueSetTrackerId)
+            if (_conversationState.State == State.AddIssueSetTrackerId)
             {
-                _createIssueModel.issue.tracker_id = int.Parse(message.Text);
+                _conversationState.CreateIssueModel.issue.tracker_id = int.Parse(message.Text);
                 await AddIssue(message);
                 await ChangeState(message, State.Command);
                 return;
@@ -105,7 +89,7 @@ namespace RedmineTelegramBot.Core
 
         private async Task ChangeState(Message message, State state)
         {
-            _state = state;
+            _conversationState.State = state;
 
             if (state == State.AddIssueSetIssueProjectId)
             {
@@ -178,7 +162,7 @@ namespace RedmineTelegramBot.Core
 
         private async Task AddIssue(Message message)
         {
-            var response = await _redmineApiClient.AddIssue(_createIssueModel);
+            var response = await _redmineApiClient.AddIssue(_conversationState.CreateIssueModel);
             if (response.Errors != null && response.Errors.Count > 0)
             {
                 await ReplyMessage(message, string.Join("\n", response.Errors));

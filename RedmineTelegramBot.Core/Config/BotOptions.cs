@@ -12,8 +12,6 @@ namespace RedmineTelegramBot.Core.Config
 
         public string RedmineUrl { get; set; }
 
-        public string RedmineSecret { get; set; }
-
         public string DataDirectory { get; set; }
     }
 }
