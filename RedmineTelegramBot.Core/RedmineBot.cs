@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using RedmineTelegramBot.Core.Data;
 using RedmineTelegramBot.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 
 namespace RedmineTelegramBot.Core
@@ -12,18 +15,16 @@ namespace RedmineTelegramBot.Core
     {
         private readonly ILogger<RedmineBot> _logger;
         private readonly ITelegramBotClient _telegramBotClient;
-        private readonly IConversationHandlerFactory _conversationHandlerFactory;
-
-        private readonly Dictionary<long, ConversationStateModel> _conversationStates = new Dictionary<long, ConversationStateModel>();
+        private readonly IServiceProvider _serviceProvider;
 
         public RedmineBot(
             ILogger<RedmineBot> logger,
             ITelegramBotClient telegramBotClient,
-            IConversationHandlerFactory conversationFactory)
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
             _telegramBotClient = telegramBotClient;
-            _conversationHandlerFactory = conversationFactory;
+            _serviceProvider = serviceProvider;
         }
 
         public Task Start()
@@ -50,30 +51,66 @@ namespace RedmineTelegramBot.Core
                     return;
                 }
 
-                if (!_conversationStates.ContainsKey(chatId))
-                {
-                    _conversationStates[chatId] = new ConversationStateModel()
-                    {
-                        ChatId = chatId,
-                        Username = username
-                    };
-                }
-                var handler = _conversationHandlerFactory.CreateConversationHandler(_conversationStates[chatId]);
-
-                await handler.Handle(e.Message);
+                await HandleRequest(e.Message, username, chatId);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occured while processing message.");
+                await _telegramBotClient.SendTextMessageAsync(e.Message.Chat, "An error occured while processing your request.");
+            }
+        }
+
+        private async Task HandleRequest(Message message, string username, long chatId)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var workContextSetter = (IWorkContextSetter)scope.ServiceProvider.GetRequiredService<IWorkContext>();
+                workContextSetter.ChatId = chatId;
+                workContextSetter.Username = username;
+
+                var userSettingsRepo = scope.ServiceProvider.GetRequiredService<IUserSettingsRepository>();
+                var userSettings = userSettingsRepo.GetSettings(username);
+                if (userSettings != null)
+                {
+                    workContextSetter.RedmineSecret = userSettings.RedmineSecret;
+                }
+
+                var conversationStateRepo = scope.ServiceProvider.GetRequiredService<IConversationStateRepository>();
+                var conversationState = conversationStateRepo.GetConversationState(username);
+                if (conversationState == null)
+                {
+                    conversationState = new ConversationStateModel()
+                    {
+                        ChatId = chatId,
+                        Username = username
+                    };
+                    conversationStateRepo.StoreConversationState(conversationState);
+                }
 
                 try
                 {
-                    _conversationStates[chatId] = null;
-                    await _telegramBotClient.SendTextMessageAsync(e.Message.Chat, "An error occured while processing your request. Conversation has been reset.");
+                    var handler = scope.ServiceProvider.GetRequiredService<IConversationHandler>();
+
+                    await handler.Handle(message);
+
+                    handler.SaveState();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    _logger.LogError(ex, "An error occured while resetting conversation.");
+                    _logger.LogError(ex, "An error occured while processing message.");
+
+                    try
+                    {
+                        if (conversationStateRepo.GetConversationState(username) != null)
+                        {
+                            conversationStateRepo.DeleteConversationState(username);
+                        }
+                        await _telegramBotClient.SendTextMessageAsync(message.Chat, "An error occured while processing your request. Conversation has been reset.");
+                    }
+                    catch (Exception innerEx)
+                    {
+                        _logger.LogError(innerEx, "An error occured while resetting conversation.");
+                    }
                 }
             }
         }

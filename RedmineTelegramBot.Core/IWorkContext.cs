@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace RedmineTelegramBot.Core
 {
-    public interface IConversationHandler
+    public interface IWorkContext
     {
-        Task Handle(Message message);
+        public long ChatId { get; }
 
-        void SaveState();
+        public string Username { get; }
+
+        public string RedmineSecret { get; }
     }
 }

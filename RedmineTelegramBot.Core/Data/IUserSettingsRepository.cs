@@ -8,7 +8,7 @@ namespace RedmineTelegramBot.Core.Data
 {
     public interface IUserSettingsRepository
     {
-        void StoreSettings(string username, UserSettings userSettings);
+        void StoreSettings(UserSettings userSettings);
 
         UserSettings GetSettings(string username);
     }

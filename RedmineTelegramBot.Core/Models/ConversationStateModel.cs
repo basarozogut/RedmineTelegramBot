@@ -20,6 +20,8 @@ namespace RedmineTelegramBot.Core.Models
     public enum State
     {
         Command,
+        // register
+        RegisterSecret,
         // search projects
         SearchProjects,
         // add issue

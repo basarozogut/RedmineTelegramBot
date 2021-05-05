@@ -21,12 +21,17 @@ namespace RedmineTelegramBot.Core.Modules
 
             // repositories
             services.AddTransient<IUserSettingsRepository>(c => new UsersSettingsFileRepository(_options.DataDirectory));
+            services.AddSingleton<IConversationStateRepository, InMemoryConversationStateRepository>();
+
+            // context
+            services.AddScoped<IWorkContext, WorkContext>();
 
             // app services
             services.AddTransient<IRedmineBot, RedmineBot>();
+            services.AddTransient<IConversationHandler, ConversationHandler>();
             services.AddSingleton<ITelegramBotClient>(c => new TelegramBotClient(_options.Token));
-            services.AddTransient<IConversationHandlerFactory, ConversationHandlerFactory>();
-            services.AddTransient<IRedmineApiClient,RedmineApiClient>();
+            services.AddTransient<IRestClientFactory, RestClientFactory>();
+            services.AddTransient<IRedmineApiClient, RedmineApiClient>();
         }
     }
 }

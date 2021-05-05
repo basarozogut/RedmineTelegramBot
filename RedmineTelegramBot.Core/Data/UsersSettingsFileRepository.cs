@@ -29,9 +29,12 @@ namespace RedmineTelegramBot.Core.Data
             return null;
         }
 
-        public void StoreSettings(string username, UserSettings userSettings)
+        public void StoreSettings(UserSettings userSettings)
         {
-            var path = MakePath(username);
+            if (string.IsNullOrEmpty(userSettings.Username))
+                throw new BotException("Username can't be null or empty!");
+
+            var path = MakePath(userSettings.Username);
             var json = JsonSerializer.Serialize(userSettings);
             File.WriteAllText(path, json);
         }

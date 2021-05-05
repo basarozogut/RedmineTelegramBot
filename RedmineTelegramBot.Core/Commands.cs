@@ -10,6 +10,7 @@ namespace RedmineTelegramBot.Core
     public static class Commands
     {
         public const string Cancel = "cancel";
+        public const string Register = "register";
         public const string ProjectList = "projectlist";
         public const string AddIssue = "addissue";
 
@@ -20,6 +21,11 @@ namespace RedmineTelegramBot.Core
                  {
                     Command = Cancel,
                     Description = "Cancel current command."
+                 },
+                 new BotCommand()
+                 {
+                    Command = Register,
+                    Description = "Register user & secret."
                  },
                  new BotCommand()
                  {

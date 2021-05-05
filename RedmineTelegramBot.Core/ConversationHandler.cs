@@ -1,4 +1,5 @@
-﻿using RedmineTelegramBot.Core.Models;
+﻿using RedmineTelegramBot.Core.Data;
+using RedmineTelegramBot.Core.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,23 +10,32 @@ namespace RedmineTelegramBot.Core
 {
     public class ConversationHandler : IConversationHandler
     {
+        private readonly IWorkContext _workContext;
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly IRedmineApiClient _redmineApiClient;
+        private readonly IUserSettingsRepository _userSettingsRepository;
+        private readonly IConversationStateRepository _conversationStateRepository;
 
-        private readonly ConversationStateModel _conversationState;
+        private ConversationStateModel _conversationState;
 
         public ConversationHandler(
+            IWorkContext workContext,
             ITelegramBotClient telegramBotClient,
             IRedmineApiClient redmineApiClient,
-            ConversationStateModel conversationState)
+            IUserSettingsRepository userSettingsRepository,
+            IConversationStateRepository conversationStateRepository)
         {
+            _workContext = workContext;
             _telegramBotClient = telegramBotClient;
             _redmineApiClient = redmineApiClient;
-            _conversationState = conversationState;
+            _userSettingsRepository = userSettingsRepository;
+            _conversationStateRepository = conversationStateRepository;
         }
 
         public async Task Handle(Message message)
         {
+            _conversationState = _conversationStateRepository.GetConversationState(_workContext.Username);
+
             if (message.Text == $"/{Commands.Cancel}")
             {
                 await ChangeState(message, State.Command);
@@ -35,6 +45,18 @@ namespace RedmineTelegramBot.Core
 
             if (_conversationState.State == State.Command)
             {
+                if (message.Text == $"/{Commands.Register}")
+                {
+                    await ChangeState(message, State.RegisterSecret);
+                    return;
+                }
+
+                if (!CheckRegistration())
+                {
+                    await ReplyMessage(message, "You must register your redmine secret before using any functionality.");
+                    return;
+                }
+
                 if (message.Text == $"/{Commands.ProjectList}")
                 {
                     await ChangeState(message, State.SearchProjects);
@@ -47,6 +69,23 @@ namespace RedmineTelegramBot.Core
                     await ChangeState(message, State.AddIssueSetIssueProjectId);
                     return;
                 }
+            }
+
+            if (_conversationState.State == State.RegisterSecret)
+            {
+                var settings = _userSettingsRepository.GetSettings(_conversationState.Username);
+                if (settings == null)
+                {
+                    settings = new UserSettings()
+                    {
+                        Username = _conversationState.Username
+                    };
+                }
+                settings.RedmineSecret = message.Text;
+                _userSettingsRepository.StoreSettings(settings);
+                await ReplyMessage(message, "User registered.");
+                await ChangeState(message, State.Command);
+                return;
             }
 
             if (_conversationState.State == State.SearchProjects)
@@ -87,11 +126,26 @@ namespace RedmineTelegramBot.Core
             await ReplyMessage(message, "Unknown text or command:\n" + message.Text);
         }
 
+        private bool CheckRegistration()
+        {
+            var userSettings = _userSettingsRepository.GetSettings(_workContext.Username);
+            if (userSettings == null || string.IsNullOrEmpty(userSettings.RedmineSecret))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private async Task ChangeState(Message message, State state)
         {
             _conversationState.State = state;
 
-            if (state == State.AddIssueSetIssueProjectId)
+            if (state == State.RegisterSecret)
+            {
+                await ReplyMessage(message, "Redmine Secret:\n");
+            }
+            else if (state == State.AddIssueSetIssueProjectId)
             {
                 await ReplyMessage(message, "Project Id:\n");
             }
@@ -171,6 +225,11 @@ namespace RedmineTelegramBot.Core
             {
                 await ReplyMessage(message, "Issue created.");
             }
+        }
+
+        public void SaveState()
+        {
+            _conversationStateRepository.StoreConversationState(_conversationState);
         }
     }
 }

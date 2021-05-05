@@ -12,18 +12,20 @@ namespace RedmineTelegramBot.Core
     public class RestClientFactory : IRestClientFactory
     {
         private readonly BotOptions _botOptions;
-        private readonly UserSettings _userSettings;
+        private readonly IWorkContext _workContext;
 
-        public RestClientFactory(BotOptions botOptions, UserSettings userSettings)
+        public RestClientFactory(
+            BotOptions botOptions,
+            IWorkContext workContext)
         {
             _botOptions = botOptions;
-            _userSettings = userSettings;
+            _workContext = workContext;
         }
 
         public IRestClient CreateRestClient()
         {
             var client = new RestClient(_botOptions.RedmineUrl);
-            client.AddDefaultHeader("X-Redmine-API-Key", _userSettings.RedmineSecret);
+            client.AddDefaultHeader("X-Redmine-API-Key", _workContext.RedmineSecret);
 
             return client;
         }
