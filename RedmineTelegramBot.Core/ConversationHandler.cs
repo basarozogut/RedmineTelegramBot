@@ -51,6 +51,12 @@ namespace RedmineTelegramBot.Core
                     return;
                 }
 
+                if (message.Text == $"/{Commands.Unregister}")
+                {
+                    await UnregisterUser(message);
+                    return;
+                }
+
                 if (!CheckRegistration())
                 {
                     await ReplyMessage(message, "You must register your redmine secret before using any functionality.");
@@ -124,6 +130,13 @@ namespace RedmineTelegramBot.Core
             }
 
             await ReplyMessage(message, "Unknown text or command:\n" + message.Text);
+        }
+
+        private Task UnregisterUser(Message message)
+        {
+            _userSettingsRepository.DeleteSettings(_workContext.Username);
+
+            return ReplyMessage(message, "Unregistered.");
         }
 
         private bool CheckRegistration()

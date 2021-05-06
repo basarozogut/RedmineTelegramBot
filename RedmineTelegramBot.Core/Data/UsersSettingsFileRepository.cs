@@ -17,6 +17,15 @@ namespace RedmineTelegramBot.Core.Data
             _dataDirectoryPath = dataDirectoryPath;
         }
 
+        public void DeleteSettings(string username)
+        {
+            var path = MakePath(username);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+
         public UserSettings GetSettings(string username)
         {
             var path = MakePath(username);

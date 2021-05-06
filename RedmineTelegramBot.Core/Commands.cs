@@ -11,6 +11,7 @@ namespace RedmineTelegramBot.Core
     {
         public const string Cancel = "cancel";
         public const string Register = "register";
+        public const string Unregister = "unregister";
         public const string ProjectList = "projectlist";
         public const string AddIssue = "addissue";
 
@@ -26,6 +27,11 @@ namespace RedmineTelegramBot.Core
                  {
                     Command = Register,
                     Description = "Register user & secret."
+                 },
+                 new BotCommand()
+                 {
+                    Command = Unregister,
+                    Description = "Unregister user & secret."
                  },
                  new BotCommand()
                  {

@@ -11,5 +11,7 @@ namespace RedmineTelegramBot.Core.Data
         void StoreSettings(UserSettings userSettings);
 
         UserSettings GetSettings(string username);
+
+        void DeleteSettings(string username);
     }
 }
