@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using RedmineTelegramBot.Core.Config;
 using RedmineTelegramBot.Core.Data;
 using RedmineTelegramBot.Core.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -16,15 +18,18 @@ namespace RedmineTelegramBot.Core
         private readonly ILogger<RedmineBot> _logger;
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly IServiceProvider _serviceProvider;
+        private readonly BotOptions _botOptions;
 
         public RedmineBot(
             ILogger<RedmineBot> logger,
             ITelegramBotClient telegramBotClient,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            BotOptions botOptions)
         {
             _logger = logger;
             _telegramBotClient = telegramBotClient;
             _serviceProvider = serviceProvider;
+            _botOptions = botOptions;
         }
 
         public Task Start()
@@ -42,6 +47,12 @@ namespace RedmineTelegramBot.Core
         {
             var username = e.Message.Chat.Username;
             var chatId = e.Message.Chat.Id;
+
+            if (!_botOptions.AllowedUsers.Contains(username))
+            {
+                await _telegramBotClient.SendTextMessageAsync(e.Message.Chat, "You are not allowed to interact with the bot.");
+                return;
+            }
 
             try
             {

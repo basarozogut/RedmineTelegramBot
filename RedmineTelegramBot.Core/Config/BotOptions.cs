@@ -13,5 +13,7 @@ namespace RedmineTelegramBot.Core.Config
         public string RedmineUrl { get; set; }
 
         public string DataDirectory { get; set; }
+
+        public string[] AllowedUsers { get; set; }
     }
 }
