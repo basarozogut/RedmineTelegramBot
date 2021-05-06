@@ -19,6 +19,7 @@ namespace RedmineTelegramBot.Standalone
             // Initialize serilog logger
             Log.Logger = new LoggerConfiguration()
                  .WriteTo.Console(Serilog.Events.LogEventLevel.Debug)
+                 .WriteTo.File(@"log.txt", rollingInterval: RollingInterval.Day)
                  .MinimumLevel.Debug()
                  .Enrich.FromLogContext()
                  .CreateLogger();
