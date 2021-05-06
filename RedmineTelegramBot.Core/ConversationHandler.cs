@@ -36,6 +36,12 @@ namespace RedmineTelegramBot.Core
         {
             _conversationState = _conversationStateRepository.GetConversationState(_workContext.Username);
 
+            if (message.Text == "/start")
+            {
+                await ReplyMessage(message, "Hello. Please use / key to see command list. You must first register your api secret with /register command to use other commands.");
+                return;
+            }
+
             if (message.Text == $"/{Commands.Cancel}")
             {
                 await ChangeState(message, State.Command);
