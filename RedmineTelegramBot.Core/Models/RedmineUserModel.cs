@@ -8,12 +8,12 @@ namespace RedmineTelegramBot.Core.Models
 {
     public class RedmineUserModel
     {
-        public int Id { get; set; }
+        public int id { get; set; }
 
-        public string Login { get; set; }
+        public string login { get; set; }
 
-        public string Firstname { get; set; }
+        public string firstname { get; set; }
 
-        public string Lastname { get; set; }
+        public string lastname { get; set; }
     }
 }

@@ -8,6 +8,6 @@ namespace RedmineTelegramBot.Core.Models
 {
     public class RedmineResponseModel
     {
-        public List<string> Errors { get; set; }
+        public List<string> errors { get; set; }
     }
 }

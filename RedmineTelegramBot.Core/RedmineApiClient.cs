@@ -30,8 +30,8 @@ namespace RedmineTelegramBot.Core
             {
                 var request = new RestRequest($"/projects.json?offset={offset}&limit={limit}");
                 var result = await client.GetAsync<RedmineGetProjectsResultModel>(request);
-                projects.AddRange(result.Projects);
-                total = result.TotalCount;
+                projects.AddRange(result.projects);
+                total = result.total_count;
                 offset += limit;
             }
 
@@ -54,7 +54,7 @@ namespace RedmineTelegramBot.Core
             var request = new RestRequest($"/trackers.json");
             var result = await client.GetAsync<RedmineGetTrackersResultModel>(request);
 
-            return result.Trackers;
+            return result.trackers;
         }
 
         public Task<RedmineResponseModel> AssignIssue(int id, AssignIssueModel issue)
@@ -80,8 +80,8 @@ namespace RedmineTelegramBot.Core
             {
                 var request = new RestRequest($"/users.json?offset={offset}&limit={limit}");
                 var result = await client.GetAsync<RedmineGetUsersModel>(request);
-                users.AddRange(result.Users);
-                total = result.TotalCount;
+                users.AddRange(result.users);
+                total = result.total_count;
                 offset += limit;
             }
 

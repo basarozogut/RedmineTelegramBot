@@ -232,12 +232,12 @@ namespace RedmineTelegramBot.Core
 
             if (searchPattern != "*")
             {
-                projects = projects.Where(r => r.Name.Contains(searchPattern, StringComparison.OrdinalIgnoreCase)).ToList();
+                projects = projects.Where(r => r.name.Contains(searchPattern, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             if (projects.Any())
             {
-                var projectListStr = string.Join("\n", projects.OrderBy(r => r.Name).Select(r => $"{r.Id}) {r.Name}"));
+                var projectListStr = string.Join("\n", projects.OrderBy(r => r.name).Select(r => $"{r.id}) {r.name}"));
 
                 await ReplyMessage(message, projectListStr);
             }
@@ -252,7 +252,7 @@ namespace RedmineTelegramBot.Core
         private async Task ReplyWithTrackerList(Message message)
         {
             var trackers = await _redmineApiClient.GetTrackers();
-            var trackersStr = string.Join("\n", trackers.OrderBy(r => r.Id).Select(r => $"{r.Id}) {r.Name}"));
+            var trackersStr = string.Join("\n", trackers.OrderBy(r => r.id).Select(r => $"{r.id}) {r.name}"));
 
             await ReplyMessage(message, $"Trackers:\n{trackersStr}");
         }
@@ -260,7 +260,7 @@ namespace RedmineTelegramBot.Core
         private async Task ReplyWithUserList(Message message)
         {
             var users = await _redmineApiClient.GetUsers();
-            var trackersStr = string.Join("\n", users.OrderBy(r => r.Id).Select(r => $"{r.Id}) {r.Login} ({r.Firstname} {r.Lastname})"));
+            var trackersStr = string.Join("\n", users.OrderBy(r => r.id).Select(r => $"{r.id}) {r.login} ({r.firstname} {r.lastname})"));
 
             await ReplyMessage(message, $"Users:\n{trackersStr}");
         }
@@ -284,9 +284,9 @@ namespace RedmineTelegramBot.Core
             var model = new AssignIssueModel();
             model.issue.assigned_to_id = int.Parse(message.Text);
             var response = await _redmineApiClient.AssignIssue(_conversationState.LastIssueId, model);
-            if (response != null && response.Errors != null && response.Errors.Count > 0)
+            if (response != null && response.errors != null && response.errors.Count > 0)
             {
-                await ReplyMessage(message, string.Join("\n", response.Errors));
+                await ReplyMessage(message, string.Join("\n", response.errors));
             }
             else
             {

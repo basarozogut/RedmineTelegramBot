@@ -8,6 +8,6 @@ namespace RedmineTelegramBot.Core.Models
 {
     public class RedmineGetTrackersResultModel
     {
-        public List<RedmineTrackerModel> Trackers { get; set; }
+        public List<RedmineTrackerModel> trackers { get; set; }
     }
 }

@@ -8,12 +8,12 @@ namespace RedmineTelegramBot.Core.Models
 {
     public class RedmineGetProjectsResultModel
     {
-        public List<RedmineProjectModel> Projects { get; set; }
+        public List<RedmineProjectModel> projects { get; set; }
 
-        public int TotalCount { get; set; }
+        public int total_count { get; set; }
 
-        public int Offset { get; set; }
+        public int offset { get; set; }
 
-        public int Limit { get; set; }
+        public int limit { get; set; }
     }
 }
