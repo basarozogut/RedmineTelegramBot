@@ -11,7 +11,7 @@ namespace RedmineTelegramBot.Core
     {
         Task<IEnumerable<RedmineProjectModel>> GetProjects();
 
-        Task<RedmineResponseModel> AddIssue(AddIssueModel issue);
+        Task<IssueAddedModel> AddIssue(AddIssueModel issue);
 
         Task<IEnumerable<RedmineTrackerModel>> GetTrackers();
     }

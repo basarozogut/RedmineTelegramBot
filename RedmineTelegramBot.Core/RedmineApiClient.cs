@@ -38,14 +38,14 @@ namespace RedmineTelegramBot.Core
             return projects;
         }
 
-        public Task<RedmineResponseModel> AddIssue(AddIssueModel issue)
+        public Task<IssueAddedModel> AddIssue(AddIssueModel issue)
         {
             var client = _restClientFactory.CreateRestClient();
 
             var request = new RestRequest("/issues.json", DataFormat.Json);
             request.AddJsonBody(issue);
 
-            return client.PostAsync<RedmineResponseModel>(request);
+            return client.PostAsync<IssueAddedModel>(request);
         }
 
         public async Task<IEnumerable<RedmineTrackerModel>> GetTrackers()

@@ -236,12 +236,13 @@ namespace RedmineTelegramBot.Core
         private async Task AddIssue(Message message)
         {
             var response = await _redmineApiClient.AddIssue(_conversationState.CreateIssueModel);
-            if (response.Errors != null && response.Errors.Count > 0)
+            if (response.errors != null && response.errors.Count > 0)
             {
-                await ReplyMessage(message, string.Join("\n", response.Errors));
+                await ReplyMessage(message, string.Join("\n", response.errors));
             }
             else
             {
+                _conversationState.LastIssueId = response.issue.id;
                 await ReplyMessage(message, "Issue created.");
             }
         }

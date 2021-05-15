@@ -15,6 +15,8 @@ namespace RedmineTelegramBot.Core.Models
         public State State { get; set; } = State.Command;
 
         public AddIssueModel CreateIssueModel { get; set; }
+
+        public int LastIssueId { get; set; }
     }
 
     public enum State

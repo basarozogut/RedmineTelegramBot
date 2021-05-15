@@ -14,6 +14,7 @@ namespace RedmineTelegramBot.Core
         public const string Unregister = "unregister";
         public const string ProjectList = "projectlist";
         public const string AddIssue = "addissue";
+        public const string AssignIssue = "assignissue";
 
         public static List<BotCommand> GetBotCommands()
         {
@@ -43,6 +44,11 @@ namespace RedmineTelegramBot.Core
                     Command = AddIssue,
                     Description = "Add an issue to a project."
                  },
+                 new BotCommand()
+                 {
+                    Command = AssignIssue,
+                    Description = "Assign last added issue to a user."
+                 }
             };
         }
     }
