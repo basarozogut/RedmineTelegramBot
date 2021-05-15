@@ -1,5 +1,4 @@
-﻿using RedmineTelegramBot.Core.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.Json;
 
 namespace RedmineTelegramBot.Core.Data
@@ -22,17 +21,17 @@ namespace RedmineTelegramBot.Core.Data
             _store.Remove(username);
         }
 
-        public ConversationStateModel GetConversationState(string username)
+        public ConversationState GetConversationState(string username)
         {
             if (_store.ContainsKey(username))
             {
-                return JsonSerializer.Deserialize<ConversationStateModel>(_store[username]);
+                return JsonSerializer.Deserialize<ConversationState>(_store[username]);
             }
 
             return null;
         }
 
-        public void StoreConversationState(ConversationStateModel conversationState)
+        public void StoreConversationState(ConversationState conversationState)
         {
             _store[conversationState.Username] = JsonSerializer.Serialize(conversationState);
         }

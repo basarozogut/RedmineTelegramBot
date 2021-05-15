@@ -1,5 +1,4 @@
-﻿using RedmineTelegramBot.Core.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +8,9 @@ namespace RedmineTelegramBot.Core.Data
 {
     public interface IConversationStateRepository
     {
-        ConversationStateModel GetConversationState(string username);
+        ConversationState GetConversationState(string username);
 
-        void StoreConversationState(ConversationStateModel conversationState);
+        void StoreConversationState(ConversationState conversationState);
 
         void DeleteConversationState(string username);
     }

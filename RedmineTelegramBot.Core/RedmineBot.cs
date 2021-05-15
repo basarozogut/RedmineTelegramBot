@@ -90,7 +90,7 @@ namespace RedmineTelegramBot.Core
                 var conversationState = conversationStateRepo.GetConversationState(username);
                 if (conversationState == null)
                 {
-                    conversationState = new ConversationStateModel()
+                    conversationState = new ConversationState()
                     {
                         ChatId = chatId,
                         Username = username

@@ -1,12 +1,13 @@
-﻿using System;
+﻿using RedmineTelegramBot.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RedmineTelegramBot.Core.Models
+namespace RedmineTelegramBot.Core.Data
 {
-    public class ConversationStateModel
+    public class ConversationState
     {
         public long ChatId { get; set; }
 

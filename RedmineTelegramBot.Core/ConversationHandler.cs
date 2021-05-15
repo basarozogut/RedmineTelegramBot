@@ -16,7 +16,7 @@ namespace RedmineTelegramBot.Core
         private readonly IUserSettingsRepository _userSettingsRepository;
         private readonly IConversationStateRepository _conversationStateRepository;
 
-        private ConversationStateModel _conversationState;
+        private ConversationState _conversationState;
 
         public ConversationHandler(
             IWorkContext workContext,
