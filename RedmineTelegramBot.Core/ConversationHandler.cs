@@ -81,6 +81,18 @@ namespace RedmineTelegramBot.Core
                     await ChangeState(message, State.AddIssueSetIssueProjectId);
                     return;
                 }
+
+                if (message.Text == $"/{Commands.AssignIssue}")
+                {
+                    if (_conversationState.LastIssueId == 0)
+                    {
+                        await ReplyMessage(message, "No recently created issue exists.");
+                        return;
+                    }
+
+                    await ChangeState(message, State.AssignIssueSetUserId);
+                    return;
+                }
             }
 
             if (_conversationState.State == State.RegisterSecret)
@@ -135,6 +147,13 @@ namespace RedmineTelegramBot.Core
                 return;
             }
 
+            if (_conversationState.State == State.AssignIssueSetUserId)
+            {
+                await AssignIssue(message);
+                await ChangeState(message, State.Command);
+                return;
+            }
+
             await ReplyMessage(message, "Unknown text or command:\n" + message.Text);
         }
 
@@ -185,6 +204,11 @@ namespace RedmineTelegramBot.Core
             {
                 await ReplyMessage(message, "Search pattern (type * for all):\n");
             }
+            else if (state == State.AssignIssueSetUserId)
+            {
+                await ReplyWithUserList(message);
+                await ReplyMessage(message, "User Id:\n");
+            }
         }
 
         private Task ReplyMessage(Message message, string text)
@@ -221,7 +245,7 @@ namespace RedmineTelegramBot.Core
             {
                 await ReplyMessage(message, "No project found matching the filter.");
             }
-            
+
             await ChangeState(message, State.Command);
         }
 
@@ -231,6 +255,14 @@ namespace RedmineTelegramBot.Core
             var trackersStr = string.Join("\n", trackers.OrderBy(r => r.Id).Select(r => $"{r.Id}) {r.Name}"));
 
             await ReplyMessage(message, $"Trackers:\n{trackersStr}");
+        }
+
+        private async Task ReplyWithUserList(Message message)
+        {
+            var users = await _redmineApiClient.GetUsers();
+            var trackersStr = string.Join("\n", users.OrderBy(r => r.Id).Select(r => $"{r.Id}) {r.Login} ({r.Firstname} {r.Lastname})"));
+
+            await ReplyMessage(message, $"Users:\n{trackersStr}");
         }
 
         private async Task AddIssue(Message message)
@@ -244,6 +276,21 @@ namespace RedmineTelegramBot.Core
             {
                 _conversationState.LastIssueId = response.issue.id;
                 await ReplyMessage(message, "Issue created.");
+            }
+        }
+
+        private async Task AssignIssue(Message message)
+        {
+            var model = new AssignIssueModel();
+            model.issue.assigned_to_id = int.Parse(message.Text);
+            var response = await _redmineApiClient.AssignIssue(_conversationState.LastIssueId, model);
+            if (response.Errors != null && response.Errors.Count > 0)
+            {
+                await ReplyMessage(message, string.Join("\n", response.Errors));
+            }
+            else
+            {
+                await ReplyMessage(message, "Issue assigned to user.");
             }
         }
 

@@ -31,5 +31,7 @@ namespace RedmineTelegramBot.Core.Models
         AddIssueSetIssueSubject,
         AddIssueSetIssueDescription,
         AddIssueSetTrackerId,
+        // assign issue
+        AssignIssueSetUserId
     }
 }

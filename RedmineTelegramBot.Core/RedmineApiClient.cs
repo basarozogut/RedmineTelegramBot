@@ -56,5 +56,36 @@ namespace RedmineTelegramBot.Core
 
             return result.Trackers;
         }
+
+        public Task<RedmineResponseModel> AssignIssue(int id, AssignIssueModel issue)
+        {
+            var client = _restClientFactory.CreateRestClient();
+
+            var request = new RestRequest($"/issues/{id}.json", DataFormat.Json);
+            request.AddJsonBody(issue);
+
+            return client.PutAsync<RedmineResponseModel>(request);
+        }
+
+        public async Task<IEnumerable<RedmineUserModel>> GetUsers()
+        {
+            var client = _restClientFactory.CreateRestClient();
+
+            var users = new List<RedmineUserModel>();
+            var offset = 0;
+            var limit = 100;
+            var total = 9999;
+
+            while (offset < total)
+            {
+                var request = new RestRequest($"/users.json?offset={offset}&limit={limit}");
+                var result = await client.GetAsync<RedmineGetUsersModel>(request);
+                users.AddRange(result.Users);
+                total = result.TotalCount;
+                offset += limit;
+            }
+
+            return users;
+        }
     }
 }
