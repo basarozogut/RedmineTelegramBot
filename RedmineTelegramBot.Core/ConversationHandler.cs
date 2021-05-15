@@ -284,7 +284,7 @@ namespace RedmineTelegramBot.Core
             var model = new AssignIssueModel();
             model.issue.assigned_to_id = int.Parse(message.Text);
             var response = await _redmineApiClient.AssignIssue(_conversationState.LastIssueId, model);
-            if (response.Errors != null && response.Errors.Count > 0)
+            if (response != null && response.Errors != null && response.Errors.Count > 0)
             {
                 await ReplyMessage(message, string.Join("\n", response.Errors));
             }
