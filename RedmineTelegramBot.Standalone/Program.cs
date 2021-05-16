@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using RedmineTelegramBot.Core;
 using RedmineTelegramBot.Core.Config;
 using RedmineTelegramBot.Core.Modules;
+using RedmineTelegramBot.Telegram;
 using Serilog;
 using System;
 using System.Threading.Tasks;
@@ -51,7 +52,9 @@ namespace RedmineTelegramBot.Standalone
 
             BuildConfiguration();
 
-            services.RegisterModule(new RedmineBotModule(Configuration.GetSection("TelegramBot").Get<BotOptions>()));
+            var botOptions = Configuration.GetSection("TelegramBot").Get<BotOptions>();
+            services.RegisterModule(new RedmineBotModule(botOptions));
+            services.RegisterModule(new TelegramModule(botOptions));
         }
 
         private static void BuildConfiguration()

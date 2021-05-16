@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RedmineTelegramBot.Core\RedmineTelegramBot.Core.csproj" />
+    <ProjectReference Include="..\RedmineTelegramBot.Telegram\RedmineTelegramBot.Telegram.csproj" />
   </ItemGroup>
 
   <ItemGroup>

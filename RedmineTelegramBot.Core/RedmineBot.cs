@@ -7,27 +7,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Telegram.Bot;
-using Telegram.Bot.Args;
-using Telegram.Bot.Types;
 
 namespace RedmineTelegramBot.Core
 {
     public class RedmineBot : IRedmineBot
     {
         private readonly ILogger<RedmineBot> _logger;
-        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly IChatClient _chatClient;
         private readonly IServiceProvider _serviceProvider;
         private readonly BotOptions _botOptions;
 
         public RedmineBot(
             ILogger<RedmineBot> logger,
-            ITelegramBotClient telegramBotClient,
+            IChatClient chatClient,
             IServiceProvider serviceProvider,
             BotOptions botOptions)
         {
             _logger = logger;
-            _telegramBotClient = telegramBotClient;
+            _chatClient = chatClient;
             _serviceProvider = serviceProvider;
             _botOptions = botOptions;
         }
@@ -36,21 +33,21 @@ namespace RedmineTelegramBot.Core
         {
             _logger.LogInformation("Bot started.");
 
-            _telegramBotClient.OnMessage += _telegramBotClient_OnMessage;
-            _telegramBotClient.StartReceiving();
-            _telegramBotClient.SetMyCommandsAsync(Commands.GetBotCommands());
+            _chatClient.OnMessage += _telegramBotClient_OnMessage;
+            _chatClient.StartReceiving();
+            //_chatClient.SetMyCommandsAsync(Commands.GetBotCommands());
 
             return Task.CompletedTask;
         }
 
-        private async void _telegramBotClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
+        private async void _telegramBotClient_OnMessage(object sender, ChatClientEventArgs e)
         {
-            var username = e.Message.Chat.Username;
-            var chatId = e.Message.Chat.Id;
+            var username = e.ChatMessage.Username;
+            var chatId = e.ChatMessage.ChatId;
 
             if (!_botOptions.AllowedUsers.Contains(username))
             {
-                await _telegramBotClient.SendTextMessageAsync(e.Message.Chat, "You are not allowed to interact with the bot.");
+                await _chatClient.SendTextMessageAsync(e.ChatMessage.ChatId, "You are not allowed to interact with the bot.");
                 return;
             }
 
@@ -58,20 +55,20 @@ namespace RedmineTelegramBot.Core
             {
                 if (string.IsNullOrEmpty(username))
                 {
-                    await _telegramBotClient.SendTextMessageAsync(e.Message.Chat, "You must have a username to use this bot.");
+                    await _chatClient.SendTextMessageAsync(e.ChatMessage.ChatId, "You must have a username to use this bot.");
                     return;
                 }
 
-                await HandleRequest(e.Message, username, chatId);
+                await HandleRequest(e.ChatMessage, username, chatId);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occured while processing message.");
-                await _telegramBotClient.SendTextMessageAsync(e.Message.Chat, "An error occured while processing your request.");
+                await _chatClient.SendTextMessageAsync(e.ChatMessage.ChatId, "An error occured while processing your request.");
             }
         }
 
-        private async Task HandleRequest(Message message, string username, long chatId)
+        private async Task HandleRequest(ChatMessage message, string username, string chatId)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -116,7 +113,7 @@ namespace RedmineTelegramBot.Core
                         {
                             conversationStateRepo.DeleteConversationState(username);
                         }
-                        await _telegramBotClient.SendTextMessageAsync(message.Chat, "An error occured while processing your request. Conversation has been reset.");
+                        await _chatClient.SendTextMessageAsync(message.ChatId, "An error occured while processing your request. Conversation has been reset.");
                     }
                     catch (Exception innerEx)
                     {
@@ -128,7 +125,7 @@ namespace RedmineTelegramBot.Core
 
         public Task Stop()
         {
-            _telegramBotClient.StopReceiving();
+            _chatClient.StopReceiving();
 
             _logger.LogInformation("Bot stopped.");
 

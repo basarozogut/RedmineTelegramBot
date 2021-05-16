@@ -8,7 +8,7 @@ namespace RedmineTelegramBot.Core
 {
     public interface IWorkContext
     {
-        public long ChatId { get; }
+        public string ChatId { get; }
 
         public string Username { get; }
 

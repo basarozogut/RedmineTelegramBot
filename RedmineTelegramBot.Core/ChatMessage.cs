@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace RedmineTelegramBot.Core
 {
-    public interface IConversationHandler
+    public class ChatMessage
     {
-        Task Handle(ChatMessage message);
+        public string Username {get;set;}
 
-        void SaveState();
+        public string ChatId { get; set; }
+
+        public string Text { get; set; }
     }
 }

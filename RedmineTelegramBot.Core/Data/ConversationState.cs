@@ -9,7 +9,7 @@ namespace RedmineTelegramBot.Core.Data
 {
     public class ConversationState
     {
-        public long ChatId { get; set; }
+        public string ChatId { get; set; }
 
         public string Username { get; set; }
 

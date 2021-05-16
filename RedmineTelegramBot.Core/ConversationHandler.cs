@@ -3,15 +3,13 @@ using RedmineTelegramBot.Core.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace RedmineTelegramBot.Core
 {
     public class ConversationHandler : IConversationHandler
     {
         private readonly IWorkContext _workContext;
-        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly IChatClient _chatClient;
         private readonly IRedmineApiClient _redmineApiClient;
         private readonly IUserSettingsRepository _userSettingsRepository;
         private readonly IConversationStateRepository _conversationStateRepository;
@@ -20,19 +18,19 @@ namespace RedmineTelegramBot.Core
 
         public ConversationHandler(
             IWorkContext workContext,
-            ITelegramBotClient telegramBotClient,
+            IChatClient chatClient,
             IRedmineApiClient redmineApiClient,
             IUserSettingsRepository userSettingsRepository,
             IConversationStateRepository conversationStateRepository)
         {
             _workContext = workContext;
-            _telegramBotClient = telegramBotClient;
+            _chatClient = chatClient;
             _redmineApiClient = redmineApiClient;
             _userSettingsRepository = userSettingsRepository;
             _conversationStateRepository = conversationStateRepository;
         }
 
-        public async Task Handle(Message message)
+        public async Task Handle(ChatMessage message)
         {
             _conversationState = _conversationStateRepository.GetConversationState(_workContext.Username);
 
@@ -157,7 +155,7 @@ namespace RedmineTelegramBot.Core
             await ReplyMessage(message, "Unknown text or command:\n" + message.Text);
         }
 
-        private Task UnregisterUser(Message message)
+        private Task UnregisterUser(ChatMessage message)
         {
             _userSettingsRepository.DeleteSettings(_workContext.Username);
 
@@ -175,7 +173,7 @@ namespace RedmineTelegramBot.Core
             return true;
         }
 
-        private async Task ChangeState(Message message, State state)
+        private async Task ChangeState(ChatMessage message, State state)
         {
             _conversationState.State = state;
 
@@ -211,20 +209,20 @@ namespace RedmineTelegramBot.Core
             }
         }
 
-        private Task ReplyMessage(Message message, string text)
+        private Task ReplyMessage(ChatMessage message, string text)
         {
             if (string.IsNullOrEmpty(text))
             {
                 return Task.CompletedTask;
             }
 
-            return _telegramBotClient.SendTextMessageAsync(
-             chatId: message.Chat,
+            return _chatClient.SendTextMessageAsync(
+             chatId: message.ChatId,
              text: text
            );
         }
 
-        private async Task ReplyWithProjectList(Message message, string searchPattern)
+        private async Task ReplyWithProjectList(ChatMessage message, string searchPattern)
         {
             searchPattern = searchPattern.Trim();
 
@@ -249,7 +247,7 @@ namespace RedmineTelegramBot.Core
             await ChangeState(message, State.Command);
         }
 
-        private async Task ReplyWithTrackerList(Message message)
+        private async Task ReplyWithTrackerList(ChatMessage message)
         {
             var trackers = await _redmineApiClient.GetTrackers();
             var trackersStr = string.Join("\n", trackers.OrderBy(r => r.id).Select(r => $"{r.id}) {r.name}"));
@@ -257,7 +255,7 @@ namespace RedmineTelegramBot.Core
             await ReplyMessage(message, $"Trackers:\n{trackersStr}");
         }
 
-        private async Task ReplyWithUserList(Message message)
+        private async Task ReplyWithUserList(ChatMessage message)
         {
             var users = await _redmineApiClient.GetUsers();
             var trackersStr = string.Join("\n", users.OrderBy(r => r.id).Select(r => $"{r.id}) {r.login} ({r.firstname} {r.lastname})"));
@@ -265,7 +263,7 @@ namespace RedmineTelegramBot.Core
             await ReplyMessage(message, $"Users:\n{trackersStr}");
         }
 
-        private async Task AddIssue(Message message)
+        private async Task AddIssue(ChatMessage message)
         {
             var response = await _redmineApiClient.AddIssue(_conversationState.CreateIssueModel);
             if (response.errors != null && response.errors.Count > 0)
@@ -279,7 +277,7 @@ namespace RedmineTelegramBot.Core
             }
         }
 
-        private async Task AssignIssue(Message message)
+        private async Task AssignIssue(ChatMessage message)
         {
             var model = new AssignIssueModel();
             model.issue.assigned_to_id = int.Parse(message.Text);

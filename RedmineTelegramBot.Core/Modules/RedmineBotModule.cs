@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RedmineTelegramBot.Core.Config;
 using RedmineTelegramBot.Core.Data;
-using Telegram.Bot;
 
 namespace RedmineTelegramBot.Core.Modules
 {
@@ -29,7 +28,6 @@ namespace RedmineTelegramBot.Core.Modules
             // app services
             services.AddTransient<IRedmineBot, RedmineBot>();
             services.AddTransient<IConversationHandler, ConversationHandler>();
-            services.AddSingleton<ITelegramBotClient>(c => new TelegramBotClient(_options.Token));
             services.AddTransient<IRestClientFactory, RestClientFactory>();
             services.AddTransient<IRedmineApiClient, RedmineApiClient>();
         }
