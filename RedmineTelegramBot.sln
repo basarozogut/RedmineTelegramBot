@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedmineTelegramBot.Core", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedmineTelegramBot.Telegram", "RedmineTelegramBot.Telegram\RedmineTelegramBot.Telegram.csproj", "{DBDF4AC3-6A67-4C2B-859F-966ED031D1E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedmineTelegramBot.Cli", "RedmineTelegramBot.Cli\RedmineTelegramBot.Cli.csproj", "{B88727FC-42C2-4D47-806B-C715BAD72192}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{DBDF4AC3-6A67-4C2B-859F-966ED031D1E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBDF4AC3-6A67-4C2B-859F-966ED031D1E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBDF4AC3-6A67-4C2B-859F-966ED031D1E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B88727FC-42C2-4D47-806B-C715BAD72192}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B88727FC-42C2-4D47-806B-C715BAD72192}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B88727FC-42C2-4D47-806B-C715BAD72192}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B88727FC-42C2-4D47-806B-C715BAD72192}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

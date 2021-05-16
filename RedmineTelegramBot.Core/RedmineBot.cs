@@ -29,15 +29,13 @@ namespace RedmineTelegramBot.Core
             _botOptions = botOptions;
         }
 
-        public Task Start()
+        public async Task Start()
         {
             _logger.LogInformation("Bot started.");
 
             _chatClient.OnMessage += _telegramBotClient_OnMessage;
+            await _chatClient.SetCommandsAsync(Commands.GetBotCommands());
             _chatClient.StartReceiving();
-            //_chatClient.SetMyCommandsAsync(Commands.GetBotCommands());
-
-            return Task.CompletedTask;
         }
 
         private async void _telegramBotClient_OnMessage(object sender, ChatClientEventArgs e)

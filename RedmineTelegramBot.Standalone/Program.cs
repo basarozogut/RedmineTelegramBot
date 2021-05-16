@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using RedmineTelegramBot.Cli;
 using RedmineTelegramBot.Core;
 using RedmineTelegramBot.Core.Config;
 using RedmineTelegramBot.Core.Modules;
@@ -53,8 +54,12 @@ namespace RedmineTelegramBot.Standalone
             BuildConfiguration();
 
             var botOptions = Configuration.GetSection("TelegramBot").Get<BotOptions>();
+            var implementation = Configuration["Implementation"];
             services.RegisterModule(new RedmineBotModule(botOptions));
-            services.RegisterModule(new TelegramModule(botOptions));
+            if (implementation == "Telegram")
+                services.RegisterModule(new TelegramModule(botOptions));
+            else if (implementation == "CLI")
+                services.RegisterModule(new CliClientModule());
         }
 
         private static void BuildConfiguration()

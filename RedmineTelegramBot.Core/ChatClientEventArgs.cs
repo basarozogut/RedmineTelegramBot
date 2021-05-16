@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RedmineTelegramBot.Core
 {
-    public class ChatClientEventArgs
+    public class ChatClientEventArgs : EventArgs
     {
         public ChatMessage ChatMessage { get; }
 
