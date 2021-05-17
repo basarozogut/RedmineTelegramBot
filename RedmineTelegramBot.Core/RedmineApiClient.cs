@@ -87,5 +87,12 @@ namespace RedmineTelegramBot.Core
 
             return users;
         }
+
+        public Task<RedmineGetIssueModel> GetIssue(int id)
+        {
+            var client = _restClientFactory.CreateRestClient();
+            var request = new RestRequest($"/issues/{id}.json");
+            return client.GetAsync<RedmineGetIssueModel>(request);
+        }
     }
 }

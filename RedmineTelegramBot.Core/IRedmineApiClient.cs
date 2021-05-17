@@ -18,5 +18,7 @@ namespace RedmineTelegramBot.Core
         Task<IEnumerable<RedmineTrackerModel>> GetTrackers();
 
         Task<IEnumerable<RedmineUserModel>> GetUsers();
+
+        Task<RedmineGetIssueModel> GetIssue(int id);
     }
 }

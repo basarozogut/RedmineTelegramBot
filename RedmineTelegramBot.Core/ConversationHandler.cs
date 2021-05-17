@@ -88,6 +88,9 @@ namespace RedmineTelegramBot.Core
                         return;
                     }
 
+                    var lastIssue = await _redmineApiClient.GetIssue(_conversationState.LastIssueId);
+                    await ReplyMessage(message, $"Assigning to issue: {lastIssue.issue.id}) {lastIssue.issue.subject}");
+
                     await ChangeState(message, State.AssignIssueSetUserId);
                     return;
                 }
