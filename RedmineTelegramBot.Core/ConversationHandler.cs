@@ -276,7 +276,7 @@ namespace RedmineTelegramBot.Core
             else
             {
                 _conversationState.LastIssueId = response.issue.id;
-                await ReplyMessage(message, "Issue created.");
+                await ReplyMessage(message, $"Issue created (#{response.issue.id}).");
             }
         }
 
