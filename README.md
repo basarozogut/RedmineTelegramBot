@@ -12,7 +12,7 @@ A Telegram bot interface for Redmine REST api. Also the user interface is abstra
 - **Context cancellation:** You can cancel any command before the command is fully prepared for execution.
 
 ## Motivation of the Software:
-It might seem unnecessary to create a bot/command interpreter for Redmine but of course I had my personal motivations for making one. My motivations for this project are based purely on personal growth and personal use cases.
+It might seem unnecessary to create a bot/command interpreter for Redmine but of course I had my personal motivations for making one. My motivations for this project are based purely based on learning purposes and personal use cases.
 
 ### General Motivations:
 - **Practicality:** Sometimes an idea or bug pops up from nowhere so you may need to create an issue for it immediately. Seems like Redmine is mostly designed to be used from a PC, so the mobile experience is not the best. Still, this bot is mostly tech savy friendly, not for everyone.
