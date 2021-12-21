@@ -2,7 +2,7 @@
 A Telegram bot interface for Redmine REST api. Also the user interface is abstracted away from the Telegram API so it can be used from alternative text based shells (e.g. command line and other chats bots).
 
 <p align="center">
-  <img width="884" height="946" src="https://github.com/basarozogut/RedmineTelegramBot/blob/master/preview.png">
+  <img width="884" src="https://github.com/basarozogut/RedmineTelegramBot/blob/master/preview.png">
 </p>
 
 ## Current Features:
