@@ -1,6 +1,10 @@
 # Redmine Telegram Bot
 A Telegram bot interface for Redmine REST api. Also the user interface is abstracted away from the Telegram API so it can be used from alternative text based shells (e.g. command line and other chats bots).
 
+<p align="center">
+  <img width="884" height="946" src="https://github.com/basarozogut/RedmineTelegramBot/blob/master/preview.png">
+</p>
+
 ## Current Features:
 - **Username based security:** Bot is only allowed to obey commands from previously specified usernames.
 - **Usernames bound to Redmine secrets:** The Telegram usernames are bound to Redmine secrets so every command you send will be executed using your Redmine user credentials.
